@@ -51,8 +51,13 @@ def main():
     cv2.destroyAllWindows()
     
     print("💾 计算完成，请在 3D 窗口中自由拖拽查看轨迹！(关闭图形窗口以结束程序)")
-    # 3. 保持 3D 窗口开启
-    viz3d.close()
+    
+    # 告诉它把截图保存在哪里
+    os.makedirs(config['output_dir'], exist_ok=True)
+    save_file = os.path.join(config['output_dir'], "trajectory_3d.png")
+    
+    # 3. 保持 3D 窗口开启，并自动截图！
+    viz3d.close(save_path=save_file)
 
 if __name__ == "__main__":
     main()

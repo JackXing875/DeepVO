@@ -61,7 +61,12 @@ class TrajectoryVisualizer3D:
         # 暂停极短的时间 (1毫秒)，让 GUI 渲染画面，同时处理你的鼠标拖拽事件
         plt.pause(0.001)
 
-    def close(self):
-        """视频跑完后，关闭交互模式并保持窗口打开，直到你手动关掉它"""
-        plt.ioff()
-        plt.show()
+    def close(self, save_path=None):
+            """视频跑完后，关闭交互模式并保持窗口打开，支持自动保存截图"""
+            plt.ioff()
+            # 如果传了保存路径，就在展示前自动截一张超高清的图
+            if save_path:
+                self.fig.savefig(save_path, dpi=300, bbox_inches='tight', facecolor=self.fig.get_facecolor())
+                print(f"📸 3D 轨迹超清截图已自动保存至: {save_path}")
+                
+            plt.show()
