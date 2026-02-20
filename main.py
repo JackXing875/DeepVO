@@ -11,7 +11,7 @@ def main():
     initializing the tracking engine, and managing the real-time 
     visualization loop.
     """
-    print("LiveVO System Initializing...")
+    print("DeepVO System Initializing...")
     
     # Load system configurations from the YAML file.
     config_path = "configs/kitti_config.yaml"
