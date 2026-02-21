@@ -6,7 +6,7 @@
 
 [中文版本 (Chinese Version)](README_ch.md)
 
-DeepVO is an industrial-grade Monocular Visual Odometry (VO) pipeline that combines the precision of self-supervised deep learning with the rigor of classical epipolar geometry. By leveraging **SuperPoint** for feature tracking and robust geometric solvers, DeepVO estimates 3D camera trajectories from a single monocular video stream.
+DeepVO is an Monocular Visual Odometry (VO) pipeline that combines the precision of self-supervised deep learning with the rigor of classical epipolar geometry. By leveraging **SuperPoint** for feature tracking and robust geometric solvers, DeepVO estimates 3D camera trajectories from a single monocular video stream.
 
 
 
