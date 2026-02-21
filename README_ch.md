@@ -45,11 +45,18 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+- **准备数据集**：
+
+请将第一人称视角的 MP4 视频文件放入 data/dataset/ 目录下。
+
+```bash
+mkdir -p data/dataset
+cp test_video.mp4 data/dataset/
+```
 
 - **运行**：
 ```bash
 python3 main.py
-
 ```
 
 

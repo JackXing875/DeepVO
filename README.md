@@ -48,6 +48,15 @@ pip install -r requirements.txt
 ```
 
 
+- **Prepare Dataset**:
+Place a first-person perspective MP4 video into the data/dataset/ directory.
+
+```bash
+mkdir -p data/dataset
+cp test_video.mp4 data/dataset/
+```
+
+
 - **Execute**:
 ```bash
 python3 main.py
