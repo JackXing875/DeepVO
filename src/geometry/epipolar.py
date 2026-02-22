@@ -59,37 +59,51 @@ class EpipolarGeometry:
         
         return idx1, idx2
 
-    def estimate_pose(self, kpts1: np.ndarray, kpts2: np.ndarray):
-        """Computes the 3D camera motion (R, t) from 2D matched point pairs.
+    def estimate_pose(
+        self, kpts1: np.ndarray, kpts2: np.ndarray
+    ) -> tuple[np.ndarray | None, np.ndarray | None, np.ndarray | None]:
+        """Estimates the camera motion (R, t) between two frames.
 
         Args:
-            kpts1 (np.ndarray): Matched keypoint coordinates in the first frame, shape (M, 2).
-            kpts2 (np.ndarray): Matched keypoint coordinates in the second frame, shape (M, 2).
+            kpts1: A NumPy array of shape (N, 2) containing keypoints from the first frame.
+            kpts2: A NumPy array of shape (N, 2) containing matched keypoints from the second frame.
 
         Returns:
-            tuple: A tuple (R, t, inlier_mask) where:
-                - R (np.ndarray or None): 3x3 rotation matrix.
-                - t (np.ndarray or None): 3x1 translation vector.
-                - inlier_mask (np.ndarray or None): Boolean mask of RANSAC inliers.
+            A tuple containing:
+                - R: A 3x3 rotation matrix (np.ndarray), or None if estimation fails.
+                - t: A 3x1 translation vector (np.ndarray), or None if estimation fails.
+                - inlier_mask: A 1D boolean array indicating valid correspondences,
+                  or None if estimation fails.
         """
-        # A minimum of 8 points is required to reliably compute the Essential matrix.
-        if len(kpts1) < 8 or len(kpts2) < 8:
+        # A minimum of 5 points is mathematically required to compute the Essential matrix.
+        if len(kpts1) < 5:
             return None, None, None
-            
-        # Compute the Essential matrix E using RANSAC for outlier rejection.
+
+        # Utilize USAC_MAGSAC for highly robust outlier rejection.
+        # Confidence is set to 0.9999 for deep sampling, and the threshold is set to 1.0.
         E, mask = cv2.findEssentialMat(
-            kpts1, kpts2, self.K, 
-            method=cv2.RANSAC, prob=0.999, threshold=1.0
+            points1=kpts1, 
+            points2=kpts2, 
+            cameraMatrix=self.K, 
+            method=cv2.USAC_MAGSAC, 
+            prob=0.9999, 
+            threshold=1.0
+        )
+
+        # Ensure the Essential matrix was computed successfully and has the correct dimensions.
+        if E is None or E.shape != (3, 3):
+            return None, None, None
+
+        # Recover the relative rotation (R) and translation (t) from the Essential matrix.
+        _, R, t, mask_pose = cv2.recoverPose(
+            E=E, 
+            points1=kpts1, 
+            points2=kpts2, 
+            cameraMatrix=self.K, 
+            mask=mask
         )
         
-        if E is None:
-            return None, None, None
-            
-        # Decompose the Essential matrix into Rotation (R) and Translation (t).
-        # cv2.recoverPose automatically selects the valid cheirality configuration.
-        _, R, t, mask_pose = cv2.recoverPose(E, kpts1, kpts2, self.K, mask=mask)
-        
-        # Flatten the mask to a 1D boolean array indicating valid inliers.
+        # Flatten the mask into a 1D boolean array for efficient external filtering.
         inlier_mask = mask_pose.ravel() > 0
         
         return R, t, inlier_mask
